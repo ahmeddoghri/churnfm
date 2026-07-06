@@ -8,6 +8,10 @@
 ![deps](https://img.shields.io/badge/runtime%20deps-none-success)
 ![license](https://img.shields.io/badge/license-MIT-black)
 
+> **Detect drift with PSI and retrain automatically — before precision rots.**
+> In the benchmark, a static model recovers to **80%** post-drift accuracy
+> while the adaptive one reaches **89%**. Zero deps: `python -m churnfm.eval`.
+
 Most churn models are trained once and left running until someone notices
 precision quietly dropped. ChurnFM instead **monitors the prediction
 distribution** with the Population Stability Index (PSI) and **retrains
