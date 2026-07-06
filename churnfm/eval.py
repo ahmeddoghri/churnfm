@@ -31,7 +31,6 @@ def run(n: int = 3000, batch_size: int = 200, drift_at: float = 0.5, seed: int =
     ref_window = rows[: batch_size * 2]        # first two batches = reference/training
     stream = rows[batch_size * 2:]
     batches = _batches(stream, batch_size)
-    drift_batch_index = int(len(batches) * drift_at) - 2  # roughly where drift kicks in
 
     # --- static: train once, never retrain ---
     static_model = ChurnModel().fit(ref_window)
