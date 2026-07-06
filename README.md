@@ -63,15 +63,15 @@ cd churnfm && pip install -e .
 python examples/quickstart.py
 ```
 
-## Monitor a stream
-
-```
-
 Or with Docker:
 
 ```bash
 docker build -t churnfm .
 docker run --rm churnfm
+```
+
+## Monitor a stream
+
 ```python
 from churnfm import ChurnMonitor, generate
 
@@ -119,6 +119,12 @@ ChurnMonitor(model=MyTabularModel().fit(reference_rows), reference_scores=[...])
 ```bash
 pip install pytest && pytest -q      # 6 passing
 ```
+
+## More in this series
+
+Nine small, dependency-light, benchmarked tools for LLM/ML infrastructure — each reproduces its headline number locally with no API keys:
+
+[agentmem](https://github.com/ahmeddoghri/agentmem) · [rubricagent](https://github.com/ahmeddoghri/rubricagent) · [clarifyrag](https://github.com/ahmeddoghri/clarifyrag) · [citebench](https://github.com/ahmeddoghri/citebench) · [guardrail-gate](https://github.com/ahmeddoghri/guardrail-gate) · [tablextract](https://github.com/ahmeddoghri/tablextract) · [vllm-cost-router](https://github.com/ahmeddoghri/vllm-cost-router) · [taggate](https://github.com/ahmeddoghri/taggate)
 
 ## License
 
