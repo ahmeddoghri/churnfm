@@ -1,4 +1,4 @@
-from churnfm import ChurnModel, generate, ChurnMonitor, assess
+from churnfm import ChurnModel, ChurnMonitor, assess, generate
 from churnfm.eval import run
 
 

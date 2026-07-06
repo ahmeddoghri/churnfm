@@ -6,10 +6,10 @@
 >>> 0.0 <= model.predict_proba(rows[0]) <= 1.0
 True
 """
-from .data import Row, generate, features, FEATURE_NAMES
-from .model import ChurnModel
+from .data import FEATURE_NAMES, Row, features, generate
 from .drift import DriftReport, assess, psi
-from .monitor import ChurnMonitor, BatchResult
+from .model import ChurnModel
+from .monitor import BatchResult, ChurnMonitor
 
 __all__ = [
     "Row", "generate", "features", "FEATURE_NAMES",
