@@ -2,6 +2,7 @@
 
 **A churn classifier with drift detection and automated retraining.**
 
+![CI](https://github.com/ahmeddoghri/churnfm/actions/workflows/ci.yml/badge.svg)
 ![tests](https://img.shields.io/badge/tests-6%20passing-brightgreen)
 ![python](https://img.shields.io/badge/python-3.9%2B-blue)
 ![deps](https://img.shields.io/badge/runtime%20deps-none-success)
@@ -60,6 +61,13 @@ python examples/quickstart.py
 
 ## Monitor a stream
 
+```
+
+Or with Docker:
+
+```bash
+docker build -t churnfm .
+docker run --rm churnfm
 ```python
 from churnfm import ChurnMonitor, generate
 
