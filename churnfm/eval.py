@@ -1,11 +1,11 @@
 """Does drift-triggered retraining actually pay for itself?
 
 We generate a churn stream with a concept drift at the midpoint (a pricing
-change makes price-sensitivity the dominant churn driver — the model trained
+change makes price-sensitivity the dominant churn driver, the model trained
 on the old relationship silently degrades). Two policies are compared:
 
-  * static    — train once on the first window, never retrain
-  * adaptive  — ChurnFM: monitor PSI on prediction distributions, retrain on
+  * static: train once on the first window, never retrain
+  * adaptive: ChurnFM. Monitor PSI on prediction distributions, retrain on
                 accumulated labeled history whenever drift crosses threshold
 
 We report precision on batches *before* and *after* the drift to show the
@@ -41,7 +41,7 @@ def run(n: int = 3000, batch_size: int = 200, drift_at: float = 0.5, seed: int =
         static_results.append((prec, rec))
 
     # --- adaptive: ChurnFM monitor with drift-triggered retraining ---
-    # Retrain on a *recent* sliding window, not all accumulated history — mixing
+    # Retrain on a *recent* sliding window, not all accumulated history, mixing
     # in stale pre-drift examples would keep re-triggering drift indefinitely
     # and the model would never stabilize after the underlying relationship
     # actually changes.

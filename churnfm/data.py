@@ -2,7 +2,7 @@
 
 Simulates a B2B subscription business: usage, support tickets, tenure, and
 plan tier predict churn. Halfway through the stream the *true* relationship
-shifts (a pricing change makes price-sensitivity matter much more) — the kind
+shifts (a pricing change makes price-sensitivity matter much more), the kind
 of concept drift that silently rots a churn model in production and is exactly
 why automated retraining triggers matter.
 """

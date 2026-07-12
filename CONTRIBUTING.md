@@ -12,9 +12,10 @@ pytest -q
 
 ## Before opening a pull request
 
-- Keep changes focused; one logical change per PR.
-- Add or update tests for any behaviour you change — CI runs `pytest` on
-  Python 3.9 through 3.13, plus the example and benchmark scripts.
+- Keep changes focused. One logical change per PR, not a drive-by rewrite.
+- Add or update tests for any behaviour you change. CI runs `pytest` on
+  Python 3.9 through 3.13, plus the example and benchmark scripts, so it
+  will find you.
 - Keep the public API type-annotated; the package ships a `py.typed` marker,
   so type regressions are user-visible.
 - Run `pytest -q` locally and make sure it passes.

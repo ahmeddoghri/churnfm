@@ -3,8 +3,8 @@
 PSI compares the distribution of predicted churn probabilities between a
 reference window (when the model was trained) and the current window. A
 silently-drifting relationship between features and outcome shows up as a
-shift in the prediction distribution even before accuracy visibly collapses —
-which is what should trigger a retrain, not a fixed schedule.
+shift in the prediction distribution even before accuracy visibly collapses.
+That's what should trigger a retrain, not a fixed schedule.
 """
 from __future__ import annotations
 

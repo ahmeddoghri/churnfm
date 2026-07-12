@@ -8,32 +8,38 @@
 ![deps](https://img.shields.io/badge/runtime%20deps-none-success)
 ![license](https://img.shields.io/badge/license-MIT-black)
 
-> **Detect drift with PSI and retrain automatically — before precision rots.**
-> In the benchmark, a static model recovers to **80%** post-drift accuracy
-> while the adaptive one reaches **89%**. Zero deps: `python -m churnfm.eval`.
+> **Detect drift with PSI and retrain automatically, before precision
+> rots.** In the benchmark, a static model recovers to **80%** post-drift
+> accuracy while the adaptive one reaches **89%**. Zero deps:
+> `python -m churnfm.eval`.
 
-Most churn models are trained once and left running until someone notices
-precision quietly dropped. ChurnFM instead **monitors the prediction
-distribution** with the Population Stability Index (PSI) and **retrains
-automatically** the moment the underlying relationship shifts — a pricing
-change, a new competitor, a product pivot — instead of waiting for a
-dashboard to look wrong.
+Most churn models get trained once, deployed, and then quietly ghosted.
+Nobody's watching when a pricing change, a new competitor, or a product
+pivot rewrites the actual relationship between your features and who
+leaves. The model doesn't know any of that happened. It just keeps
+answering questions based on a world that no longer exists, like an ex
+who still thinks you're together.
+
+ChurnFM watches the prediction distribution itself using the Population
+Stability Index, and retrains the moment the underlying relationship
+shifts, instead of waiting for a dashboard to look wrong three weeks
+later.
 
 Runs with **zero dependencies and zero API keys** (pure-stdlib logistic
-regression trained by gradient descent). The point isn't the model
-architecture — swap `ChurnModel` for a real tabular foundation model (the
-`google/tabfm`-class of pretrained tabular classifiers trending on Hugging
-Face right now) or a gradient-boosted-tree model via the same
-`fit`/`predict_proba` interface. The point is the **monitor-and-retrain loop**
-around it.
+regression trained by gradient descent). The point was never the model
+architecture. Swap `ChurnModel` for a real tabular foundation model or a
+gradient-boosted-tree model through the same `fit`/`predict_proba`
+interface if you want. The point is the **monitor-and-retrain loop**
+wrapped around it, which doesn't care what's inside.
 
 ---
 
 ## The result in one number
 
 A synthetic B2B subscription stream with a concept drift injected at the
-midpoint (a pricing change makes price-sensitivity the dominant churn driver —
-the classic way churn models silently rot in production):
+midpoint. A pricing change makes price-sensitivity the dominant churn
+driver, the exact way churn models silently rot in production without
+anyone noticing:
 
 ```bash
 python -m churnfm.eval
@@ -48,12 +54,13 @@ adaptive                      15%                    89%
 adaptive retrained at batches: [6, 7, 8]
 ```
 
-Both policies score identically before the drift (as they should — same
-model). After the pricing relationship changes, the static model's precision
-stalls while the PSI monitor catches the shift and triggers a retrain,
-recovering precision. (Precision here is **precision@k** with k = actual
-positives — the standard ranking metric for imbalanced churn, since a fixed
-probability cutoff is meaningless when churn is a single-digit-percent event.)
+Both policies score identically before the drift, as they should, since
+it's the same model. After the pricing relationship changes, the static
+model's precision stalls while the PSI monitor catches the shift and
+triggers a retrain. Precision here is precision@k with k = actual
+positives, the standard ranking metric for imbalanced churn, since a
+fixed probability cutoff is meaningless when churn is a single-digit
+percent event.
 
 ## Install
 
@@ -94,14 +101,15 @@ ChurnMonitor.fit(reference_window)
 
 process_batch(batch, recent_history)
   ├─ score the batch
-  ├─ PSI(reference_scores, batch_scores)   -- distribution shift, not just accuracy
+  ├─ PSI(reference_scores, batch_scores)   -- how far the distribution has drifted
   └─ if PSI >= threshold: retrain on recent_history, reset reference distribution
 ```
 
-Retraining on a **recent sliding window** rather than all accumulated history
-matters: mixing in stale pre-drift examples would keep re-triggering drift
-indefinitely and the model would never stabilize after the relationship
-actually settles into its new state.
+Retraining on a **recent sliding window**, rather than all accumulated
+history, matters: mixing in stale pre-drift examples would keep
+re-triggering the drift alarm indefinitely, and the model would never
+settle down after the relationship actually stabilizes into its new
+shape.
 
 ## Bring your own model
 
@@ -122,7 +130,7 @@ pip install pytest && pytest -q      # 6 passing
 
 ## More in this series
 
-Nine small, dependency-light, benchmarked tools for LLM/ML infrastructure — each reproduces its headline number locally with no API keys:
+Nine small, dependency-light, benchmarked tools for LLM/ML infrastructure. Each one reproduces its headline number locally with no API keys:
 
 [agentmem](https://github.com/ahmeddoghri/agentmem) · [rubricagent](https://github.com/ahmeddoghri/rubricagent) · [clarifyrag](https://github.com/ahmeddoghri/clarifyrag) · [citebench](https://github.com/ahmeddoghri/citebench) · [guardrail-gate](https://github.com/ahmeddoghri/guardrail-gate) · [tablextract](https://github.com/ahmeddoghri/tablextract) · [vllm-cost-router](https://github.com/ahmeddoghri/vllm-cost-router) · [taggate](https://github.com/ahmeddoghri/taggate)
 

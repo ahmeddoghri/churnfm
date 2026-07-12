@@ -1,4 +1,4 @@
-"""ChurnFM — a churn classifier with drift-triggered automated retraining.
+"""ChurnFM, a churn classifier with drift-triggered automated retraining.
 
 >>> from churnfm import ChurnModel, generate
 >>> rows = generate(n=500, seed=0)

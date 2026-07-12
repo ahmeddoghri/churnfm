@@ -22,8 +22,8 @@ def _precision_recall(rows: list[Row], probs: list[float]):
 
     Churn is rare (single-digit base rate here), so a fixed 0.5 probability
     cutoff never fires and silently reports 0% precision regardless of model
-    quality. Ranking-based evaluation — flag the top-k highest-risk accounts,
-    where k matches the actual positive count — is the standard way churn/fraud
+    quality. Ranking-based evaluation, flag the top-k highest-risk accounts,
+    where k matches the actual positive count, is the standard way churn/fraud
     models are evaluated in practice, and it isolates ranking quality from
     calibration.
     """
