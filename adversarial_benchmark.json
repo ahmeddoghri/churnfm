@@ -1,0 +1,52 @@
+{
+  "scenario_check": {
+    "covariate_shift_confound": {
+      "name": "covariate_shift_confound",
+      "pre_base_rate": 0.0353,
+      "post_base_rate": 0.6947,
+      "feature_shift": 0.003
+    },
+    "pure_concept_drift": {
+      "name": "pure_concept_drift",
+      "pre_base_rate": 0.2707,
+      "post_base_rate": 0.308,
+      "feature_shift": 0.003
+    }
+  },
+  "confounded_scenario": {
+    "n_batches": 13,
+    "static_pre": 0.155,
+    "static_post": 0.7982,
+    "psi_only_pre": 0.155,
+    "psi_only_post": 0.892,
+    "psi_retrains": [
+      6,
+      7,
+      8
+    ]
+  },
+  "pure_concept_drift": {
+    "psi_only": {
+      "n_batches": 13,
+      "static_pre": 0.4192,
+      "static_post": 0.1441,
+      "psi_only_pre": 0.4192,
+      "psi_only_post": 0.1441,
+      "psi_retrains": []
+    },
+    "dual_signal": {
+      "n_batches": 13,
+      "static_pre": 0.4192,
+      "static_post": 0.1441,
+      "dual_pre": 0.4192,
+      "dual_post": 0.4084,
+      "retrains": [
+        [
+          6,
+          "outcome"
+        ]
+      ],
+      "outcome_only_retrains": 1
+    }
+  }
+}

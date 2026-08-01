@@ -7,6 +7,34 @@ on:
     branches: [main]
 
 jobs:
+  adversarial:
+    # PSI-only monitoring can silently stop detecting drift entirely: on the
+    # isolated concept-drift scenario it never fires, and precision stays
+    # collapsed for the rest of the stream. This fails the build if the
+    # dual-signal monitor stops catching what PSI misses.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install package
+        run: pip install -e .
+      - name: Score against isolated concept drift
+        run: |
+          python -m churnfm.eval_v2
+          python - <<'EOF'
+          from churnfm.eval_v2 import build_report
+
+          report = build_report()
+          pcd = report["pure_concept_drift"]
+
+          assert len(pcd["psi_only"]["psi_retrains"]) == 0, pcd["psi_only"]
+          assert len(pcd["dual_signal"]["retrains"]) >= 1, pcd["dual_signal"]
+          assert pcd["dual_signal"]["dual_post"] > pcd["dual_signal"]["static_post"] + 0.15, pcd["dual_signal"]
+          print("dual-signal monitor still catches what PSI misses")
+          EOF
+
   test:
     runs-on: ubuntu-latest
     strategy:

@@ -3,7 +3,7 @@
 **A churn classifier with drift detection and automated retraining.**
 
 ![CI](https://github.com/ahmeddoghri/churnfm/actions/workflows/ci.yml/badge.svg)
-![tests](https://img.shields.io/badge/tests-6%20passing-brightgreen)
+![tests](https://img.shields.io/badge/tests-30%20passing-brightgreen)
 ![python](https://img.shields.io/badge/python-3.9%2B-blue)
 ![deps](https://img.shields.io/badge/runtime%20deps-none-success)
 ![license](https://img.shields.io/badge/license-MIT-black)
@@ -12,6 +12,13 @@
 > rots.** In the benchmark, a static model recovers to **80%** post-drift
 > accuracy while the adaptive one reaches **89%**. Zero deps:
 > `python -m churnfm.eval`.
+>
+> Then I isolated the drift from the confound riding along with it (the
+> benchmark's "drift" also multiplies the churn base rate 20x, which is
+> most of why even the static model scores 80%), and PSI **never fired**:
+> precision fell from 42% to 14% while PSI sat under 0.05 against a
+> threshold of 0.25. `python -m churnfm.eval_v2` is the benchmark that
+> found it, and the outcome-based signal that catches what PSI misses.
 
 Most churn models get trained once, deployed, and then quietly ghosted.
 Nobody's watching when a pricing change, a new competitor, or a product
@@ -61,6 +68,97 @@ triggers a retrain. Precision here is precision@k with k = actual
 positives, the standard ranking metric for imbalanced churn, since a
 fixed probability cutoff is meaningless when churn is a single-digit
 percent event.
+
+## The drift that number doesn't test
+
+I went looking for how much of that 15% -> 89% recovery was actually the
+monitor catching drift, versus the scenario just becoming easier. It was
+mostly the second thing.
+
+```bash
+python -m churnfm.eval_v2
+```
+```
+Scenario check: what actually moved across the drift point
+  covariate_shift_confound  base rate 3.5% -> 69.5%   feature shift 0.3%
+  pure_concept_drift        base rate 27.1% -> 30.8%  feature shift 0.3%
+```
+
+The bundled "drift" changes three things at the stream midpoint: the
+coefficient on `price_increase_pct` (real concept drift), the
+*distribution* of `price_increase_pct` (covariate shift), and, as a side
+effect of both, the churn base rate, which jumps **20x**, from 3.5% to
+69.5%. A base rate that high makes churn nearly a coin a model can call
+correctly just by leaning toward "churned". That's most of why even the
+**static** model scores 80% post-drift; the problem got easier, not just
+different.
+
+`pure_concept_drift` isolates the thing PSI is supposed to detect: the
+relationship between features and outcome inverts while the base rate and
+input distributions stay put by construction (0.3% feature shift, versus
+the confounded scenario's 66-point base-rate swing). On that scenario:
+
+```
+policy         pre-drift    post-drift    retrains
+static              42%          14%
+psi_only             42%          14%             0
+dual_signal          42%          41%             1
+```
+
+**PSI never fires. Zero retrains, for the rest of the stream's life.**
+Directly measured: PSI stayed under 0.05 (threshold 0.25) while precision
+fell from 42% to 14%, because a logistic model re-scores the *same input
+distribution* through the same fitted function whether the relationship
+underneath has changed or not. The predicted-score distribution looks
+just as healthy after the world flipped as before.
+
+### What catches it
+
+PSI compares scores to scores. `assess_outcomes` compares the model's
+predictive quality on labeled outcomes, reference window against current
+batch, using log-loss. A model whose relationship to the world has
+inverted gets measurably worse at labels it has never adjusted for, even
+when its score distribution hasn't moved an inch. `ChurnMonitorV2`
+retrains on either PSI or outcome drift firing; on the isolated scenario,
+outcome drift is the one that actually does it.
+
+The trade is immediacy for ground truth: PSI can flag drift before any
+label exists for new data, outcome drift needs labels, which in a real
+churn pipeline arrive weeks after the fact. Run both.
+
+### Retraining on the wrong window makes it worse, not better
+
+The first fix I tried kept the original sliding-window retrain (last two
+batches of labeled history) and just added the outcome trigger. Precision
+after retraining stayed at 9-12%, no better than never retraining. The
+window mixed labeled examples from *both* regimes, half teaching the old
+relationship and half the new, inverted one, and a model fit on that
+mixture learns something close to nothing. Retraining on just the single
+batch that tripped the alarm, guaranteed to be from the current regime,
+recovered precision to 38-51%.
+
+### Held out, run once
+
+The outcome-drift threshold (1.3) was tuned against the scenario above.
+A second, differently-shaped concept drift (tenure and support tickets
+swap which one protects against churn, rather than usage and tenure) was
+written afterward and run a single time:
+
+```
+policy         pre-drift    post-drift    retrains
+static              41%          21%
+psi_only             41%          21%             0
+dual_signal          41%          45%             1
+```
+
+Same story: PSI never fires, dual_signal recovers with one retrain
+triggered entirely by the outcome signal.
+
+### Limits
+
+- **Outcome drift needs labels.** In production those arrive with a lag; PSI is still the only signal available in the interim.
+- **The log-loss ratio is one threshold, tuned on synthetic data.** A real deployment should watch the ratio's distribution over a burn-in period rather than trust 1.3 blindly.
+- **This is still logistic regression on five features.** The monitoring loop is the point; swap in a real model behind the same `fit`/`predict_proba` interface for anything that matters.
 
 ## Install
 
