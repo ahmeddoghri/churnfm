@@ -2,10 +2,13 @@
 
 **A churn classifier with drift detection and automated retraining.**
 
-![tests](https://img.shields.io/badge/tests-30%20passing-brightgreen)
+[![tests](https://github.com/ahmeddoghri/churnfm/actions/workflows/tests.yml/badge.svg)](https://github.com/ahmeddoghri/churnfm/actions/workflows/tests.yml)
 ![python](https://img.shields.io/badge/python-3.9%2B-blue)
 ![deps](https://img.shields.io/badge/runtime%20deps-none-success)
 ![license](https://img.shields.io/badge/license-MIT-black)
+[![case study](https://img.shields.io/badge/case%20study-adoghri.com-e0703e)](https://adoghri.com/project-8.html)
+
+![churnfm](docs/cover.jpg)
 
 > **Detect drift with PSI and retrain automatically, before precision
 > rots.** In the benchmark, a static model recovers to **80%** post-drift
@@ -222,7 +225,7 @@ ChurnMonitor(model=MyTabularModel().fit(reference_rows), reference_scores=[...])
 ## Tests
 
 ```bash
-pip install pytest && pytest -q      # 6 passing
+pip install pytest && pytest -q      # 30 passing
 ```
 
 ## More in this series
