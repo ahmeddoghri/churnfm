@@ -12,7 +12,7 @@ the rest of the stream's life with the monitor reporting nothing wrong.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List
 
 from .data import Row
 from .drift import DriftReport, assess

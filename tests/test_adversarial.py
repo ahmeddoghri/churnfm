@@ -22,7 +22,6 @@ from churnfm.scenarios import (
     pure_concept_drift,
 )
 
-
 # --- the confound in the original scenario ----------------------------------
 
 def test_original_scenario_confounds_base_rate_with_drift():

@@ -48,5 +48,29 @@
       ],
       "outcome_only_retrains": 1
     }
+  },
+  "holdout_concept_drift": {
+    "psi_only": {
+      "n_batches": 16,
+      "static_pre": 0.4137,
+      "static_post": 0.2091,
+      "psi_only_pre": 0.4137,
+      "psi_only_post": 0.2091,
+      "psi_retrains": []
+    },
+    "dual_signal": {
+      "n_batches": 16,
+      "static_pre": 0.4137,
+      "static_post": 0.2091,
+      "dual_pre": 0.4137,
+      "dual_post": 0.4535,
+      "retrains": [
+        [
+          7,
+          "outcome"
+        ]
+      ],
+      "outcome_only_retrains": 1
+    }
   }
 }

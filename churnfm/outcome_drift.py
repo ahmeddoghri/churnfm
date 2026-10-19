@@ -35,8 +35,6 @@ import math
 from dataclasses import dataclass
 from typing import List
 
-from .data import Row
-
 
 def log_loss(probs: List[float], labels: List[int], eps: float = 1e-6) -> float:
     """Mean binary cross-entropy: how surprised the model was by what happened."""

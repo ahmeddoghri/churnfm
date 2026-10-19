@@ -21,12 +21,10 @@ import argparse
 import json
 from typing import Dict, List, Sequence
 
-from .drift import assess
 from .model import ChurnModel
 from .monitor import ChurnMonitor, _precision_recall
 from .monitor_v2 import ChurnMonitorV2
-from .outcome_drift import assess_outcomes
-from .scenarios import covariate_shift_confound, describe, pure_concept_drift
+from .scenarios import covariate_shift_confound, describe, holdout_concept_drift, pure_concept_drift
 
 
 def _batches(rows: list, batch_size: int) -> List[list]:
@@ -115,6 +113,9 @@ def build_report(n: int = 3000, batch_size: int = 200) -> Dict:
     ref_size = batch_size * 2
     confound_rows = covariate_shift_confound(n=n)
     pure_rows = pure_concept_drift(n=n)
+    # The held-out scenario keeps its own default size and seed: it was run
+    # once at those settings after the outcome threshold was frozen.
+    holdout_rows = holdout_concept_drift()
 
     return {
         "scenario_check": {
@@ -125,6 +126,10 @@ def build_report(n: int = 3000, batch_size: int = 200) -> Dict:
         "pure_concept_drift": {
             "psi_only": run_static_vs_psi_only(pure_rows, batch_size, ref_size),
             "dual_signal": run_static_vs_dual(pure_rows, batch_size, ref_size),
+        },
+        "holdout_concept_drift": {
+            "psi_only": run_static_vs_psi_only(holdout_rows, batch_size, ref_size),
+            "dual_signal": run_static_vs_dual(holdout_rows, batch_size, ref_size),
         },
     }
 
@@ -174,6 +179,25 @@ def format_report(report: Dict) -> str:
         "retrains PSI would have missed entirely."
     )
     lines.append(f"PSI-only retrained {len(psi['psi_retrains'])} time(s) on this scenario.")
+    lines.append("")
+
+    lines += [
+        "Held out: a differently-shaped concept drift (tenure and support",
+        "tickets swap roles), written after the outcome threshold was frozen",
+        "=" * 70,
+    ]
+    ho = report["holdout_concept_drift"]
+    hp, hd = ho["psi_only"], ho["dual_signal"]
+    lines.append(f"{'policy':<12}{'pre-drift':>12}{'post-drift':>13}{'retrains':>12}")
+    lines.append(f"{'static':<12}{hp['static_pre']:>11.0%}{hp['static_post']:>13.0%}{'':>12}")
+    lines.append(
+        f"{'psi_only':<12}{hp['psi_only_pre']:>11.0%}{hp['psi_only_post']:>13.0%}"
+        f"{len(hp['psi_retrains']):>12}"
+    )
+    lines.append(
+        f"{'dual_signal':<12}{hd['dual_pre']:>11.0%}{hd['dual_post']:>13.0%}"
+        f"{len(hd['retrains']):>12}"
+    )
     return "\n".join(lines)
 
 

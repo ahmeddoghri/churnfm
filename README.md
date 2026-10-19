@@ -1,4 +1,4 @@
-# 📉 ChurnFM
+# churnfm
 
 **A churn classifier with drift detection and automated retraining.**
 
@@ -29,7 +29,7 @@ leaves. The model doesn't know any of that happened. It just keeps
 answering questions based on a world that no longer exists, like an ex
 who still thinks you're together.
 
-ChurnFM watches the prediction distribution itself using the Population
+churnfm watches the prediction distribution itself using the Population
 Stability Index, and retrains the moment the underlying relationship
 shifts, instead of waiting for a dashboard to look wrong three weeks
 later.
@@ -144,7 +144,8 @@ recovered precision to 38-51%.
 The outcome-drift threshold (1.3) was tuned against the scenario above.
 A second, differently-shaped concept drift (tenure and support tickets
 swap which one protects against churn, rather than usage and tenure) was
-written afterward and run a single time:
+written afterward and run a single time. It is the last table in
+`python -m churnfm.eval_v2`:
 
 ```
 policy         pre-drift    post-drift    retrains
